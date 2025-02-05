@@ -1,0 +1,170 @@
+<<Setup Prerequisites
+Install dependencies:
+pip install requests asana stripe python-dotenv boto3 openai flask slack_sdk awscli>>
+
+<<Set up AWS credentials using:>>
+aws configure
+
+<<Create a .env file:>>
+OPENAI_API_KEY=your_openai_api_key
+ASANA_ACCESS_TOKEN=your_asana_access_token
+SLACK_BOT_TOKEN=your_slack_bot_token
+ZAPIER_HOOK_URL=your_zapier_webhook_url
+STRIPE_SECRET_KEY=your_stripe_secret_key
+AWS_REGION=your_aws_region
+
+<<AI-Powered Workflow Optimization (Auto-Prioritize Asana Tasks)>>
+import os
+import openai
+import asana
+from dotenv import load_dotenv
+
+load_dotenv()
+
+ASANA_ACCESS_TOKEN = os.getenv("ASANA_ACCESS_TOKEN")
+openai.api_key = os.getenv("OPENAI_API_KEY")
+
+client = asana.Client.access_token(ASANA_ACCESS_TOKEN)
+
+def fetch_asana_tasks():
+    tasks = client.tasks.find_all({"workspace": "your_workspace_id"})
+    return list(tasks)
+
+def prioritize_tasks():
+    tasks = fetch_asana_tasks()
+    task_names = [task["name"] for task in tasks]
+    
+    prompt = f"Sort these tasks by urgency: {', '.join(task_names)}"
+    response = openai.ChatCompletion.create(
+        model="gpt-4",
+        messages=[{"role": "user", "content": prompt}]
+    )
+    
+    sorted_tasks = response["choices"][0]["message"]["content"]
+    return sorted_tasks
+
+if __name__ == "__main__":
+    sorted_tasks = prioritize_tasks()
+    print("AI-Prioritized Tasks:\n", sorted_tasks)
+
+
+<<AI-Powered Data Processing (Auto-Process JotForm Submissions)>>
+import requests
+import json
+
+JOTFORM_API_KEY = os.getenv("JOTFORM_API_KEY")
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+
+def fetch_jotform_responses():
+    url = f"https://api.jotform.com/user/submissions?apikey={JOTFORM_API_KEY}"
+    response = requests.get(url)
+    return response.json()["content"]
+
+def analyze_form_responses():
+    responses = fetch_jotform_responses()
+    text_data = [submission["answers"]["1"]["answer"] for submission in responses]
+
+    prompt = f"Categorize these user form responses: {text_data}"
+    response = openai.ChatCompletion.create(
+        model="gpt-4",
+        messages=[{"role": "user", "content": prompt}]
+    )
+    
+    categorized_data = response["choices"][0]["message"]["content"]
+    return categorized_data
+
+print(analyze_form_responses())
+
+<<AI-Powered Stripe Fraud Detection>>
+import stripe
+
+stripe.api_key = os.getenv("STRIPE_SECRET_KEY")
+
+def analyze_payments():
+    payments = stripe.PaymentIntent.list(limit=10)
+    flagged_transactions = []
+
+    for payment in payments["data"]:
+        if payment["amount"] > 10000:  # Example: Flag high-value transactions
+            flagged_transactions.append(payment)
+
+    return flagged_transactions
+
+flagged = analyze_payments()
+print("Flagged Payments:", flagged)
+
+<<AI for Predictive System Monitoring>>
+import boto3
+import openai
+
+logs_client = boto3.client("logs", region_name=os.getenv("AWS_REGION"))
+
+def fetch_cloudwatch_logs():
+    logs = logs_client.describe_log_groups()
+    return logs["logGroups"]
+
+def detect_anomalies():
+    logs = fetch_cloudwatch_logs()
+    log_data = [log["logGroupName"] for log in logs]
+
+    response = openai.ChatCompletion.create(
+        model="gpt-4",
+        messages=[{"role": "user", "content": f"Analyze these system logs: {log_data}"}]
+    )
+
+    return response["choices"][0]["message"]["content"]
+
+print(detect_anomalies())
+
+<<AI Chatbot for Workflow Execution (Slack Bot)>>
+from slack_sdk import WebClient
+from slack_sdk.errors import SlackApiError
+
+SLACK_BOT_TOKEN = os.getenv("SLACK_BOT_TOKEN")
+client = WebClient(token=SLACK_BOT_TOKEN)
+
+def send_slack_message(channel, text):
+    try:
+        response = client.chat_postMessage(channel=channel, text=text)
+        return response
+    except SlackApiError as e:
+        print(f"Error sending message: {e.response['error']}")
+
+send_slack_message("#general", "Hello! AI-powered automation is ready!")
+
+<<AI for Code Review & Auto-Documentation>>
+import openai
+
+def generate_code_review(code_snippet):
+    prompt = f"Review the following Python code and suggest improvements:\n{code_snippet}"
+    response = openai.ChatCompletion.create(
+        model="gpt-4",
+        messages=[{"role": "user", "content": prompt}]
+    )
+    
+    return response["choices"][0]["message"]["content"]
+
+code_snippet = """
+def add_numbers(a, b):
+return a + b
+"""
+
+print(generate_code_review(code_snippet))
+
+<<AI-Powered Business Insights & KPI Predictions>>
+import openai
+
+def predict_kpis(sales_data):
+    prompt = f"Predict next quarter revenue based on these sales: {sales_data}"
+    response = openai.ChatCompletion.create(
+        model="gpt-4",
+        messages=[{"role": "user", "content": prompt}]
+    )
+    
+    return response["choices"][0]["message"]["content"]
+
+sales_data = [10000, 15000, 20000, 25000, 30000]
+print(predict_kpis(sales_data))
+
+
+
