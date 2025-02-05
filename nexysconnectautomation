@@ -17,10 +17,10 @@ import asana
 import boto3
 from dotenv import load_dotenv
 
-# Load environment variables
+ Load environment variables
 load_dotenv()
 
-# API Keys & Configurations
+ API Keys & Configurations
 ZAPIER_HOOK_URL = os.getenv("ZAPIER_HOOK_URL")
 ASANA_ACCESS_TOKEN = os.getenv("ASANA_ACCESS_TOKEN")
 ASANA_WORKSPACE_ID = os.getenv("ASANA_WORKSPACE_ID")
@@ -28,17 +28,17 @@ JOTFORM_API_KEY = os.getenv("JOTFORM_API_KEY")
 STRIPE_SECRET_KEY = os.getenv("STRIPE_SECRET_KEY")
 AWS_REGION = os.getenv("AWS_REGION")
 
-# Initialize AWS CloudWatch logging
+ Initialize AWS CloudWatch logging
 logs_client = boto3.client("logs", region_name=AWS_REGION)
 log_group = "StartupOpsLogs"
 
-# Initialize Stripe
+ Initialize Stripe
 stripe.api_key = STRIPE_SECRET_KEY
 
-# Initialize Asana Client
+ Initialize Asana Client
 asana_client = asana.Client.access_token(ASANA_ACCESS_TOKEN)
 
-# Function to log messages to CloudWatch
+ Function to log messages to CloudWatch
 def log_message(message):
     logs_client.put_log_events(
         logGroupName=log_group,
@@ -46,7 +46,7 @@ def log_message(message):
         logEvents=[{"timestamp": int(os.times()[4] * 1000), "message": message}],
     )
 
-# 1. Fetch JotForm Submissions
+ Fetch JotForm Submissions
 def fetch_jotform_submissions():
     url = f"https://api.jotform.com/user/submissions?apikey={JOTFORM_API_KEY}"
     response = requests.get(url)
@@ -58,7 +58,7 @@ def fetch_jotform_submissions():
         log_message("Failed to fetch JotForm submissions.")
         return None
 
-# 2. Create an Asana Task
+  Create an Asana Task
 def create_asana_task(task_name, notes):
     task_data = {
         "workspace": ASANA_WORKSPACE_ID,
@@ -71,7 +71,7 @@ def create_asana_task(task_name, notes):
     except Exception as e:
         log_message(f"Asana task creation failed: {str(e)}")
 
-# 3. Monitor Stripe Payments
+  Monitor Stripe Payments
 def fetch_stripe_payments():
     try:
         payments = stripe.PaymentIntent.list(limit=5)
@@ -81,7 +81,7 @@ def fetch_stripe_payments():
         log_message(f"Failed to fetch Stripe payments: {str(e)}")
         return None
 
-# 4. Send Data to Zapier
+  Send Data to Zapier
 def send_to_zapier(data):
     try:
         response = requests.post(ZAPIER_HOOK_URL, json=data)
@@ -92,7 +92,7 @@ def send_to_zapier(data):
     except Exception as e:
         log_message(f"Zapier webhook error: {str(e)}")
 
-# Main Execution
+ Main Execution
 if __name__ == "__main__":
     jotform_data = fetch_jotform_submissions()
     if jotform_data:
@@ -183,11 +183,11 @@ import requests
 import boto3
 from dotenv import load_dotenv
 
-# Load environment variables
+ Load environment variables
 load_dotenv()
 ZAPIER_HOOK_URL = os.getenv("ZAPIER_HOOK_URL")
 
-# Initialize AWS CloudWatch logging
+ Initialize AWS CloudWatch logging
 logs_client = boto3.client("logs", region_name=os.getenv("AWS_REGION"))
 log_group = "StartupOpsLogs"
 
@@ -198,7 +198,7 @@ def log_message(message):
         logEvents=[{"timestamp": int(os.times()[4] * 1000), "message": message}],
     )
 
-# Function to send data to Zapier Webhook
+ Function to send data to Zapier Webhook
 def send_to_zapier(data):
     try:
         response = requests.post(ZAPIER_HOOK_URL, json=data)
@@ -212,7 +212,7 @@ def send_to_zapier(data):
         log_message(f"Zapier webhook error: {str(e)}")
         return {"status": "error", "message": str(e)}
 
-# AWS Lambda Entry Point
+ AWS Lambda Entry Point
 def lambda_handler(event, context):
     sample_data = {
         "task_id": "12345",
@@ -272,11 +272,11 @@ import requests
 import boto3
 from dotenv import load_dotenv
 
-# Load environment variables
+ Load environment variables
 load_dotenv()
 ZAPIER_HOOK_URL = os.getenv("ZAPIER_HOOK_URL")
 
-# AWS CloudWatch Logging
+ AWS CloudWatch Logging
 logs_client = boto3.client("logs", region_name=os.getenv("AWS_REGION"))
 log_group = "StartupOpsLogs"
 
@@ -302,7 +302,7 @@ def send_to_zapier(data):
         log_message(f"Zapier webhook error: {str(e)}")
         return {"status": "error", "message": str(e)}
 
-# AWS Lambda Handler
+ AWS Lambda Handler
 def lambda_handler(event, context):
     task_data = {
         "task_id": "12345",
@@ -354,7 +354,7 @@ def send_to_zapier(data, retries=3):
         except Exception as e:
             log_message(f"Zapier webhook error: {str(e)}")
 
-        time.sleep(2 ** attempt)  # Exponential backoff
+        time.sleep(2 ** attempt)   Exponential backoff
 
     return {"status": "error", "message": "Max retries reached"}
 
